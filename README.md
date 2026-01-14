@@ -24,9 +24,13 @@ Client -> Backend /get API -> checks if key exists in Redis
                           yes -> return data      no-> fetch from db -> cache it for later calls -> return data    
 
 Base syntax for redis- 
+
 await redisClient.set(cacheKey, JSON.stringify(todos), "EX", 60);
+
 await redisClient.get(cacheKey);
+
 await redisClient.del("todos:all");
+
 await redisClient.set(`todo:${id}`, JSON.stringify(toBeUpdated), "EX", 60);
 
 
