@@ -1,0 +1,13 @@
+{
+  "family": "myapp-task",
+  "containerDefinitions": [
+    {
+      "name": "myapp",
+      "image": "<AWS_ACCOUNT_ID>.dkr.ecr.ap-south-1.amazonaws.com/myapp:latest",
+      "memory": 512,
+      "cpu": 256,
+      "essential": true,
+      "portMappings": [{ "containerPort": 3000, "hostPort": 3000 }]
+    }
+  ]
+}

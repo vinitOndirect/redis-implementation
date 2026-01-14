@@ -1,0 +1,36 @@
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to ECR
+        run: |
+          IMAGE_TAG=${{ github.sha }}
+          docker build -t myapp:$IMAGE_TAG .
+          docker tag myapp:$IMAGE_TAG <AWS_ACCOUNT_ID>.dkr.ecr.ap-south-1.amazonaws.com/myapp:$IMAGE_TAG
+          docker push <AWS_ACCOUNT_ID>.dkr.ecr.ap-south-1.amazonaws.com/myapp:$IMAGE_TAG
+
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ecs-task.json
+          service: myapp-service
+          cluster: myapp-cluster
+          wait-for-service-stability: true
